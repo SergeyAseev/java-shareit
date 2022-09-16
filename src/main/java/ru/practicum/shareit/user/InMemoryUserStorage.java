@@ -2,7 +2,6 @@ package ru.practicum.shareit.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
@@ -44,11 +43,10 @@ public class InMemoryUserStorage {
     public List<User> retrieveAllUsers() {
         return new ArrayList<>(users.values());
     }
-    public User removeById(long id) {
-        User user = getUserById(id)
-                .orElseThrow(() -> new NotFoundException(String.format("Не найден пользователь с ID %s", userId)));
-        emails.remove(user.getEmail());
-        return users.remove(id);
+
+    public void removeById(long userId) {
+        emails.remove(users.get(userId).getEmail());
+        users.remove(userId);
     }
 
 }

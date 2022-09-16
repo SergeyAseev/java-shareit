@@ -36,29 +36,33 @@ public class ItemController {
         return ItemMapper.toItemDto(itemService.createItem(item, userId));
     }
 
-    @PatchMapping({"{id}"})
+    @PatchMapping("/{id}")
     public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                              @RequestBody ItemDto itemDto, @PathVariable Long itemId) {
+                              @RequestBody ItemDto itemDto, @PathVariable Long id) {
         User user = userService.getUserById(userId);
         Item item = ItemMapper.toItem(itemDto, user);
-        return ItemMapper.toItemDto(itemService.updateItem(item, itemId, userId));
+        return ItemMapper.toItemDto(itemService.updateItem(item, id, userId));
     }
 
     @GetMapping(value = "/{id}")
-    public ItemDto getItemById(@RequestBody Long id) {
+    public ItemDto getItemById(@PathVariable Long id) {
         return ItemMapper.toItemDto(itemService.getItemById(id));
     }
 
     @GetMapping
-    public List<ItemDto> retrieveAllItem(@RequestHeader("X-Sharer-User-Id")  Long userId) {
+    public List<ItemDto> retrieveAllItem(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.retrieveAllItemByUserId(userId)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
-/*    @GetMapping("/search")
+
+    @GetMapping("/search")
     public List<ItemDto> searchItemByKeyword(@RequestParam(name = "text", defaultValue = "") String keyword) {
-        return itemService.searchItemByKeyword(keyword);
-    }*/
+        return itemService.searchItemByKeyword(keyword)
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
+    }
 }

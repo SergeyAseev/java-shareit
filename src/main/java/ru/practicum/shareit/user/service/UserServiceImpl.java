@@ -13,7 +13,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @Slf4j
@@ -24,7 +23,6 @@ public class UserServiceImpl implements UserService {
     private final InMemoryUserStorage inMemoryUserStorage;
 
     public User createUser(User user) {
-
         if (inMemoryUserStorage.getAllEmails().contains(user.getEmail())) {
             throw new ExistsElementException("User exists");
         }
@@ -34,18 +32,20 @@ public class UserServiceImpl implements UserService {
     }
 
     public User updateUser(Long userId, User user) {
-        User updatedUser = getValidUser(userId, user);
+        getUserById(userId);
+        User updatedUser = getUserValid(userId, user);
         log.info("Updated user {}", user);
         return inMemoryUserStorage.updateUser(userId, updatedUser);
     }
 
-    public User removeUserById(Long userId) {
-        return inMemoryUserStorage.removeById(userId);
+    public void removeUserById(Long userId) {
+        getUserById(userId);
+        inMemoryUserStorage.removeById(userId);
     }
 
     public User getUserById(Long userId) {
         return inMemoryUserStorage.getUserById(userId)
-                .orElseThrow(() -> new NotFoundException(String.format("Не найден пользователь с ID %s", userId)));
+                .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
     }
 
     public List<User> retrieveAllUsers() {
@@ -61,20 +61,16 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("Email not found");
         }
         if (user.getName().isEmpty()) {
-            throw new ValidationException("Имя не может быть пустым");
+            throw new ValidationException("Name have to be not empty");
         }
     }
 
-    private User getValidUser(long userId, User user) {
-        User updatedUser = inMemoryUserStorage.getUserById(userId).orElseThrow(
-                () -> new NoSuchElementException("User not found"));
+    private User getUserValid(long userId, User user) {
+        User updatedUser = getUserById(userId);
 
         String updatedName = user.getName();
         if (updatedName != null && !updatedName.isBlank())
             updatedUser.setName(updatedName);
-
-        String oldEmail = updatedUser.getEmail();
-        inMemoryUserStorage.getAllEmails().remove(oldEmail);
 
         String updatedEmail = user.getEmail();
         if (updatedEmail != null && !updatedEmail.isBlank()) {
@@ -82,6 +78,9 @@ public class UserServiceImpl implements UserService {
             if (inMemoryUserStorage.getAllEmails().contains(updatedEmail)) {
                 throw new ExistsElementException("User exists");
             }
+
+            String oldEmail = updatedUser.getEmail();
+            inMemoryUserStorage.getAllEmails().remove(oldEmail);
             updatedUser.setEmail(updatedEmail);
         }
         return updatedUser;

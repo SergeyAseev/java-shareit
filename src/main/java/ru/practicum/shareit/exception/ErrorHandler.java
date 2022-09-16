@@ -29,8 +29,10 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> handleExistsElementException(ExistsElementException e) {
+    public ResponseEntity<Map<String, String>> handleExistsElementException
+            (final ExistsElementException e) {
         log.error(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(Map.of("message", e.getMessage()),
+                HttpStatus.CONFLICT);
     }
 }

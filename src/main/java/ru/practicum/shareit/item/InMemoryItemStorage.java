@@ -2,10 +2,10 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -25,8 +25,8 @@ public class InMemoryItemStorage {
         return item;
     }
 
-    public Item updateItem(Item item) {
-        items.put(item.getId(), item);
+    public Item updateItem(Long itemId, Item item) {
+        items.put(itemId, item);
         return item;
     }
 
@@ -34,13 +34,22 @@ public class InMemoryItemStorage {
         return Optional.ofNullable(items.get(itemId));
     }
 
-    public void removeItemById(Long itemId) {
-        Item item = getItemById(itemId)
-                .orElseThrow(() -> new NotFoundException(String.format("Не найден предмет с ID %s", itemId)));
-        items.remove(itemId);
+    public List<Item> searchItemByKeyword(String keyword) {
+        List<Item> itemByKeyword = items.values().stream()
+                .filter(Item::getAvailable)
+                .filter(item -> (item.getName().toLowerCase().contains(keyword.toLowerCase())
+                        || item.getDescription().toLowerCase().contains(keyword.toLowerCase())))
+                .collect(Collectors.toList());
+        return itemByKeyword;
     }
-    public List<Item> retrieveAllUsers() {
+    public List<Item> retrieveAllItems() {
         return new ArrayList<>(items.values());
+    }
+
+    public List<Item> retrieveAllItemsByUser(Long userId) {
+        return items.values().
+                stream()
+                .filter(item -> item.getOwner().getId().equals(userId)).collect(Collectors.toList());
     }
 }
 
