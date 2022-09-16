@@ -48,8 +48,8 @@ public class InMemoryItemStorage {
     }
 
     public List<Item> retrieveAllItemsByUser(Long userId) {
-        return items.values().
-                stream()
+        return items.values()
+                .stream()
                 .filter(item -> item.getOwner().getId().equals(userId)).collect(Collectors.toList());
     }
 }
