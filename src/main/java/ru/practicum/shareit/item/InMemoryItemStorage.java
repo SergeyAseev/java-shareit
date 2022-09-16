@@ -19,7 +19,7 @@ public class InMemoryItemStorage {
         return ++itemId;
     }
 
-    public Item save(Item item){
+    public Item save(Item item) {
         item.setId(increaseItemId());
         items.put(item.getId(), item);
         return item;
@@ -42,6 +42,7 @@ public class InMemoryItemStorage {
                 .collect(Collectors.toList());
         return itemByKeyword;
     }
+
     public List<Item> retrieveAllItems() {
         return new ArrayList<>(items.values());
     }

@@ -17,7 +17,7 @@ public class ErrorHandler {
             (final ValidationException e) {
         log.info(e.getMessage());
         return new ResponseEntity<>(Map.of("message",
-                e.getMessage()),HttpStatus.BAD_REQUEST);
+                e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
@@ -25,7 +25,7 @@ public class ErrorHandler {
             (final NotFoundException e) {
         log.info(e.getMessage());
         return new ResponseEntity<>(Map.of("message",
-                e.getMessage()),HttpStatus.NOT_FOUND);
+                e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler

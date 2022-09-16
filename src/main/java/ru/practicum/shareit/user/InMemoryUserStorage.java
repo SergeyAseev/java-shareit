@@ -16,7 +16,7 @@ public class InMemoryUserStorage {
 
     private final Set<String> emails = new HashSet<>();
 
-    public long increaseUserId () {
+    public long increaseUserId() {
         return ++userId;
     }
 
@@ -27,7 +27,7 @@ public class InMemoryUserStorage {
         return user;
     }
 
-    public User updateUser(Long userId,User user) {
+    public User updateUser(Long userId, User user) {
         users.put(userId, user);
         return user;
     }

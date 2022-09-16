@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class ItemServiceImpl implements ItemService{
+public class ItemServiceImpl implements ItemService {
 
     @Autowired
     InMemoryItemStorage inMemoryItemStorage;
@@ -51,7 +51,7 @@ public class ItemServiceImpl implements ItemService{
         if (userId == null) {
             return inMemoryItemStorage.retrieveAllItems();
         } else {
-         return inMemoryItemStorage.retrieveAllItemsByUser(userId);
+            return inMemoryItemStorage.retrieveAllItemsByUser(userId);
         }
     }
 
@@ -63,7 +63,7 @@ public class ItemServiceImpl implements ItemService{
         return inMemoryItemStorage.searchItemByKeyword(keyword);
     }
 
-    private void validate (Item item) {
+    private void validate(Item item) {
         if (item.getDescription() == null) {
             throw new ValidationException("Описание не может быть пустым");
         }

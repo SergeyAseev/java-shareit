@@ -54,10 +54,11 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Проверка создаваемого пользователя на валидность
+     *
      * @param user экземпляр текущего пользователя
      */
     private void validate(User user) {
-        if (user.getEmail() ==null) {
+        if (user.getEmail() == null) {
             throw new ValidationException("Email not found");
         }
         if (user.getName().isEmpty()) {
