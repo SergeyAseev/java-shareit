@@ -3,14 +3,11 @@ package ru.practicum.shareit.user.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -22,27 +19,23 @@ public class UserController {
 
     @PostMapping
     public UserDto createUser(@RequestBody @Valid UserDto userDto) {
-        User user = UserMapper.toUser(userDto);
-        return UserMapper.toUserDto(userService.createUser(user));
+        return userService.createUser(userDto);
     }
 
     @PatchMapping("/{id}")
-    public UserDto updateUser(@RequestBody User user, @PathVariable Long id) {
-        return UserMapper.toUserDto(userService.updateUser(id, user));
+    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable Long id) {
+        return userService.updateUser(id, userDto);
     }
 
 
-    @GetMapping(value = "/{id}")
+    @GetMapping("/{id}")
     public UserDto getUserById(@PathVariable Long id) {
-        return UserMapper.toUserDto(userService.getUserById(id));
+        return userService.getUserById(id);
     }
 
     @GetMapping
     public List<UserDto> retrieveAllUsers() {
-        return userService.retrieveAllUsers()
-                .stream()
-                .map(UserMapper::toUserDto)
-                .collect(Collectors.toList());
+        return userService.retrieveAllUsers();
     }
 
     @DeleteMapping(value = "/{id}")

@@ -35,12 +35,14 @@ public class InMemoryItemStorage {
     }
 
     public List<Item> searchItemByKeyword(String keyword) {
-        List<Item> itemByKeyword = items.values().stream()
+
+        String toLowerCase = keyword.toLowerCase();
+
+        return items.values().stream()
                 .filter(Item::getAvailable)
-                .filter(item -> (item.getName().toLowerCase().contains(keyword.toLowerCase())
-                        || item.getDescription().toLowerCase().contains(keyword.toLowerCase())))
+                .filter(item -> (item.getName().toLowerCase().contains(toLowerCase)
+                        || item.getDescription().toLowerCase().contains(toLowerCase)))
                 .collect(Collectors.toList());
-        return itemByKeyword;
     }
 
     public List<Item> retrieveAllItems() {

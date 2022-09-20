@@ -49,4 +49,8 @@ public class InMemoryUserStorage {
         users.remove(userId);
     }
 
+    public boolean isEmailExists(String email) {
+        return emails.contains(email);
+    }
+
 }

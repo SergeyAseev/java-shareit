@@ -9,10 +9,12 @@ import ru.practicum.shareit.exception.ExistsElementException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.InMemoryUserStorage;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.model.UserDto;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -22,20 +24,25 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private final InMemoryUserStorage inMemoryUserStorage;
 
-    public User createUser(User user) {
-        if (inMemoryUserStorage.getAllEmails().contains(user.getEmail())) {
+    public UserDto createUser(UserDto userDto) {
+        User user = UserMapper.toUser(userDto);
+
+        if (inMemoryUserStorage.isEmailExists(user.getEmail())) {
             throw new ExistsElementException("User exists");
         }
         validate(user);
         log.info("User with ID {} was created", user.getId());
-        return inMemoryUserStorage.createUser(user);
+        User createdUser = inMemoryUserStorage.createUser(user);
+
+        return UserMapper.toUserDto(createdUser);
     }
 
-    public User updateUser(Long userId, User user) {
+    public UserDto updateUser(Long userId, UserDto userDto) {
+        User userFromDto = UserMapper.toUser(userDto);
         getUserById(userId);
-        User updatedUser = getUserValid(userId, user);
-        log.info("Updated user {}", user);
-        return inMemoryUserStorage.updateUser(userId, updatedUser);
+        User updatedUser = getUserValid(userId, userFromDto);
+        log.info("Updated user {}", userFromDto);
+        return UserMapper.toUserDto(inMemoryUserStorage.updateUser(userId, updatedUser));
     }
 
     public void removeUserById(Long userId) {
@@ -43,13 +50,17 @@ public class UserServiceImpl implements UserService {
         inMemoryUserStorage.removeById(userId);
     }
 
-    public User getUserById(Long userId) {
-        return inMemoryUserStorage.getUserById(userId)
+    public UserDto getUserById(Long userId) {
+        User user = inMemoryUserStorage.getUserById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
+        return UserMapper.toUserDto(user);
     }
 
-    public List<User> retrieveAllUsers() {
-        return new ArrayList<>(inMemoryUserStorage.retrieveAllUsers());
+    public List<UserDto> retrieveAllUsers() {
+        return inMemoryUserStorage.retrieveAllUsers()
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -67,7 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private User getUserValid(long userId, User user) {
-        User updatedUser = getUserById(userId);
+        User updatedUser = UserMapper.toUser(getUserById(userId));
 
         String updatedName = user.getName();
         if (updatedName != null && !updatedName.isBlank())
