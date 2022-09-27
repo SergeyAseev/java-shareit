@@ -1,12 +1,13 @@
 package ru.practicum.shareit.item.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.InMemoryItemStorage;
 import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserMapper;
@@ -19,10 +20,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    @Autowired
-    private InMemoryItemStorage inMemoryItemStorage;
+
+    private final ItemRepository itemRepository;
 
     @Autowired
     private UserService userService;
@@ -35,7 +37,7 @@ public class ItemServiceImpl implements ItemService {
         validate(item);
         item.setOwner(owner);
         log.info("Create Item with ID {}", item.getId());
-        return ItemMapper.toItemDto(inMemoryItemStorage.save(item));
+        return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
@@ -45,31 +47,32 @@ public class ItemServiceImpl implements ItemService {
 
         Item updatedItem = getItemValid(item, itemId, userId);
         log.info("Updated item with ID {}", itemId);
-        return ItemMapper.toItemDto(inMemoryItemStorage.updateItem(itemId, updatedItem));
+        itemRepository.save(updatedItem);
+        return ItemMapper.toItemDto(updatedItem);
     }
 
     @Override
     public ItemDto getItemById(Long itemId) {
-        Item item = inMemoryItemStorage.getItemById(itemId)
+        Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));
         return ItemMapper.toItemDto(item);
     }
 
     @Override
     public Item getItemByIdWithoutDto(Long itemId) {
-        return inMemoryItemStorage.getItemById(itemId)
+        return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));
     }
 
     @Override
     public List<ItemDto> retrieveAllItemByUserId(Long userId) {
         if (userId == null) {
-            return inMemoryItemStorage.retrieveAllItems()
+            return itemRepository.findAll()
                     .stream()
                     .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
         } else {
-            return inMemoryItemStorage.retrieveAllItemsByUser(userId)
+            return itemRepository.findByOwnerIdOrderByIdAsc(userId)
                     .stream()
                     .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
@@ -81,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
         if (keyword.isBlank() || keyword.isEmpty()) {
             return new ArrayList<>();
         }
-        return inMemoryItemStorage.searchItemByKeyword(keyword)
+        return itemRepository.findByKeyword(keyword)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());

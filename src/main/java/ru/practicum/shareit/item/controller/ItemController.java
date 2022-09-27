@@ -27,7 +27,7 @@ public class ItemController {
         return itemService.updateItem(itemDto, id, userId);
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping("/{id}")
     public ItemDto getItemById(@PathVariable Long id) {
         return itemService.getItemById(id);
     }
