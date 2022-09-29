@@ -59,7 +59,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto updateBooking(Long bookingId, Long userId, Boolean isApproved) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow( () -> new NotFoundException(String.format("Booking with ID %s doesn't exists",
+                .orElseThrow(() -> new NotFoundException(String.format("Booking with ID %s doesn't exists",
                         bookingId)));
 
         User booker = UserMapper.toUser(userService.getUserById(userId));
@@ -85,7 +85,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto getBookingById(Long bookingId, Long userId) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow( () -> new NotFoundException(String.format("Booking with ID %s doesn't exists",
+                .orElseThrow(() -> new NotFoundException(String.format("Booking with ID %s doesn't exists",
                         bookingId)));
         userService.getUserById(userId);
 

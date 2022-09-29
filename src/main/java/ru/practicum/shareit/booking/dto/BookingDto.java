@@ -6,8 +6,6 @@ import ru.practicum.shareit.booking.model.BookingStatusEnum;
 import java.time.LocalDateTime;
 
 
-
-//@StartBeforeEnd
 @Getter
 @Setter
 @AllArgsConstructor

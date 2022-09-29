@@ -20,6 +20,7 @@ public class BookingController {
 
     @Autowired
     private final BookingService bookingService;
+
     @PostMapping
     public BookingDto createBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                     @RequestBody @Valid BookingDto bookingDto) {
@@ -40,13 +41,13 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getAllBookingByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                   @PathParam("state") String state) {
-            return bookingService.getAllBookingByUserId(userId, state);
+        return bookingService.getAllBookingByUserId(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllBookingForOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                   @PathParam("state") String state) {
-            return bookingService.getAllBookingForOwner(userId, state);
+        return bookingService.getAllBookingForOwner(userId, state);
     }
 
 }
