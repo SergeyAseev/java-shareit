@@ -32,12 +32,12 @@ public class ItemMapper {
         );
     }
 
-    public static ItemDtoWithBooking toItemDtoWithBooking (List<Comment> commentList, Booking lastBooking,
-                                                           Booking nextBooking, Item item) {
+    public static ItemDtoWithBooking toItemDtoWithBooking(List<Comment> commentList, Booking lastBooking,
+                                                          Booking nextBooking, Item item) {
 
         List<ItemDtoWithBooking.Comment> comments = commentList.stream()
-                .map( comment -> {
-                    ItemDtoWithBooking.Comment comment1  = new ItemDtoWithBooking.Comment();
+                .map(comment -> {
+                    ItemDtoWithBooking.Comment comment1 = new ItemDtoWithBooking.Comment();
                     comment1.setId(comment.getId());
                     comment1.setText(comment.getText());
                     comment1.setAuthorName(comment.getUser().getName());
