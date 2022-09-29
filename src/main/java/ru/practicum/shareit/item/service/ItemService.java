@@ -34,6 +34,8 @@ public interface ItemService {
      */
     ItemDto getItemById(Long itemId);
 
+    Item getItemByIdForBooking(Long itemId);
+
     /**
      * Метод получения предметов пользователя
      *

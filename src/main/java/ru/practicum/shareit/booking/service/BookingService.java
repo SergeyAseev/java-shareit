@@ -25,18 +25,11 @@ public interface BookingService {
 
     /**
      *
-     * @param bookingDto
+     * @param bookingId
      * @param userId
      * @return
      */
-    BookingDto getBookingById(Long bookingDto, Long userId);
-
-    /**
-     *
-     * @param userId
-     * @return
-     */
-    List<BookingDto> getAllBookingByUserId(Long userId);
+    BookingDto getBookingById(Long bookingId, Long userId);
 
     /**
      *
@@ -45,13 +38,6 @@ public interface BookingService {
      * @return
      */
     List<BookingDto> getAllBookingByUserId(Long userId, String state);
-
-    /**
-     *
-     * @param userId
-     * @return
-     */
-    List<BookingDto> getAllBookingForOwner(Long userId);
 
     /**
      *

@@ -59,6 +59,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public Item getItemByIdForBooking(Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));
+        return item;
+    }
+
+    @Override
     public Item getItemByIdWithoutDto(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));

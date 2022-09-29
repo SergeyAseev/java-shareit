@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS booking
     end_date TIMESTAMP WITHOUT TIME ZONE,
     item_id BIGINT REFERENCES items (id),
     user_id BIGINT REFERENCES users (id),
-    booking_status VARCHAR(50)
+    status VARCHAR(50)
 );
 
 CREATE TABLE IF NOT EXISTS requests
