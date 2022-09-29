@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
@@ -30,10 +32,16 @@ public interface ItemService {
      * Метод получения предмета по ID
      *
      * @param itemId ID предмета
+     * @param userId ID пользователя
      * @return экзепляр сущности предмета
      */
-    ItemDto getItemById(Long itemId);
+    ItemDtoWithBooking getItemById(Long itemId, Long userId);
 
+    /**
+     *
+     * @param itemId
+     * @return
+     */
     Item getItemByIdForBooking(Long itemId);
 
     /**
@@ -42,7 +50,7 @@ public interface ItemService {
      * @param userId ID владельца предемета
      * @return список экземпляров предметов-дто пользователя
      */
-    List<ItemDto> retrieveAllItemByUserId(Long userId);
+    List<ItemDtoWithBooking> retrieveAllItemByUserId(Long userId);
 
     /**
      * Метод поиска предмета по ключевому слову
@@ -52,5 +60,20 @@ public interface ItemService {
      */
     List<ItemDto> searchItemByKeyword(String keyword);
 
+    /**
+     *
+     * @param itemId
+     * @return
+     */
     Item getItemByIdWithoutDto(Long itemId);
+
+    /**
+     *
+     * @param itemId
+     * @param userId
+     * @param commentDto
+     * @return
+     */
+
+    CommentDto addComment(Long itemId, Long userId, CommentDto commentDto);
 }

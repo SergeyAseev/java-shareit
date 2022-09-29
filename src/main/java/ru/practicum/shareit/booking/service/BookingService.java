@@ -37,7 +37,7 @@ public interface BookingService {
      * @param state
      * @return
      */
-    List<BookingDto> getAllBookingByUserId(Long userId, String state);
+    //List<BookingDto> getAllBookingByUserId(Long userId, String state);
 
     /**
      *
@@ -47,4 +47,22 @@ public interface BookingService {
      */
     List<BookingDto> getAllBookingForOwner(Long userId, String state);
 
+
+    List<BookingDto> getALlByBooker(Long userId, String state);
+
+    /**
+     *
+     * @param itemId
+     * @param userId
+     * @return
+     */
+    //Booking getLastBookingByItemId(Long itemId, Long userId);
+
+    /**
+     *
+     * @param itemId
+     * @param userId
+     * @return
+     */
+    //Booking getNextBookingByItemId(Long itemId, Long userId);
 }

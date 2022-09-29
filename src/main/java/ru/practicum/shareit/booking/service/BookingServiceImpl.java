@@ -62,9 +62,6 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException(String.format("Booking with ID %s doesn't exists",
                         bookingId)));
 
-        User booker = UserMapper.toUser(userService.getUserById(userId));
-
-        //validate(booking);
         if (!booking.getItem().getOwner().getId().equals(userId)) {
             throw new NotFoundException("User != owner");
         }
@@ -79,6 +76,7 @@ public class BookingServiceImpl implements BookingService {
         } else {
             booking.setStatus(BookingStatusEnum.REJECTED);
         }
+
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
@@ -96,13 +94,10 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    @Override
-    public List<BookingDto> getAllBookingByUserId(Long userId, String stateStr) {
+    public List<BookingDto> getAllBookingByUserId(List<Booking> bookings, String stateStr) {
 
-        userService.getUserById(userId);
-        List<Booking> bookings = new ArrayList<>();
-        LocalDateTime localDateTime = LocalDateTime.now();
         BookingStateEnum state;
+        List<Booking> bookingsReturn = new ArrayList<>();
 
         if (stateStr == null) {
             state = BookingStateEnum.ALL;
@@ -116,34 +111,72 @@ public class BookingServiceImpl implements BookingService {
 
         switch (state) {
             case ALL:
-                bookings = bookingRepository.findByBooker_IdOrderByIdDesc(userId);
-                break;
-            case CURRENT:
-                bookings = bookingRepository.findByBooker_IdAndStartAfterAndEndBefore(userId, localDateTime, localDateTime);
-                break;
-            case PAST:
-                bookings = bookingRepository.findByBooker_IdAndEndBefore(userId, localDateTime);
-                break;
-            case FUTURE:
-                bookings = bookingRepository.findByBooker_IdAndStartAfter(userId, localDateTime);
+                bookingsReturn = bookings;
                 break;
             case WAITING:
-                bookings = bookingRepository.findByBooker_IdAndStatus(userId, BookingStatusEnum.WAITING);
+            case REJECTED:
+                BookingStatusEnum status = BookingStatusEnum.valueOf(state.toString());
+                bookingsReturn = bookings.stream()
+                        .filter(booking -> booking.getStatus().equals(status))
+                        .collect(Collectors.toList());
+                break;
+            case PAST:
+                bookingsReturn = bookings.stream()
+                        .filter(booking -> LocalDateTime.now().isAfter(booking.getEnd()))
+                        .collect(Collectors.toList());
+                break;
+            case FUTURE:
+                bookingsReturn = bookings.stream()
+                        .filter(booking -> LocalDateTime.now().isBefore(booking.getStart()))
+                        .collect(Collectors.toList());
+                break;
+            case CURRENT:
+                bookingsReturn = bookings.stream()
+                        .filter(booking -> LocalDateTime.now().isAfter(booking.getStart())
+                                && LocalDateTime.now().isBefore(booking.getEnd()))
+                        .collect(Collectors.toList());
                 break;
         }
 
-        return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<BookingDto> getAllBookingForOwner(Long userId, String state) {
-
-        userService.getUserById(userId);
-        return bookingRepository.findByBooker_IdOrderByIdDesc(userId)
+        return bookingsReturn
                 .stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<BookingDto> getAllBookingForOwner(Long userId, String stateStr) {
+
+        userService.getUserById(userId);
+        List<Booking> bookings = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(userId);
+        if (bookings.isEmpty()) {
+            throw new NotFoundException("There's no bookings");
+        }
+        return getAllBookingByUserId(bookings, stateStr);
+    }
+
+    @Override
+    public List<BookingDto> getALlByBooker(Long userId, String stateStr) {
+
+        userService.getUserById(userId);
+        List<Booking> bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId);
+        if (bookings.isEmpty()) {
+            throw new NotFoundException("There's no bookings");
+        }
+        return getAllBookingByUserId(bookings, stateStr);
+    }
+
+/*    @Override
+    public Booking getLastBookingByItemId(Long itemId, Long userId) {
+        userService.getUserById(userId);
+        return bookingRepository.findFirstByItem_IdOrderByStartDesc(itemId);
+    }
+
+    @Override
+    public Booking getNextBookingByItemId(Long itemId, Long userId) {
+        userService.getUserById(userId);
+        return bookingRepository.findTopByItem_IdOrderByStartDesc(itemId);;
+    }*/
 
     private void validate(Booking booking) {
 
