@@ -13,17 +13,11 @@ import java.time.LocalDateTime;
 public class BookingDto {
 
     private Long id;
-
     private LocalDateTime start;
-
     private LocalDateTime end;
-
     private Item item;
-
     private Long itemId;
-
     private User booker;
-
     private BookingStatusEnum status;
 
     @Getter

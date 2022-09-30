@@ -8,16 +8,6 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-/*    List<Booking> findByBooker_IdOrderByIdDesc(Long userId);
-
-    List<Booking> findByBooker_IdAndStartAfterAndEndBefore(Long userId, LocalDateTime start, LocalDateTime end);
-
-    List<Booking> findByBooker_IdAndEndBefore(Long userId, LocalDateTime localDateTime);
-
-    List<Booking> findByBooker_IdAndStartAfter(Long userId, LocalDateTime localDateTime);
-
-    List<Booking> findByBooker_IdAndStatus(Long userId, BookingStatusEnum bookingStatusEnum);*/
-
     List<Booking> findAllByItem_Owner_IdOrderByStartDesc(Long userId);
 
     List<Booking> findAllByBooker_IdOrderByStartDesc(Long userId);

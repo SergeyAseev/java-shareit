@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user.service;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-//@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
 
@@ -71,20 +69,6 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * Проверка создаваемого пользователя на валидность
-     *
-     * @param user экземпляр текущего пользователя
-     */
-    private void validate(User user) {
-        if (user.getEmail() == null) {
-            throw new ValidationException("Email not found");
-        }
-        if (user.getName().isEmpty()) {
-            throw new ValidationException("Name have to be not empty");
-        }
     }
 
     private User getUserValid(long userId, User user) {

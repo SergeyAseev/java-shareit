@@ -23,10 +23,10 @@ public interface ItemService {
      *
      * @param itemDto экземпляр сущности предмета-дто, который обновляется
      * @param itemId  ID предмета
-     * @param userId  ID владельца предмета
+     * @param ownerId ID владельца предмета
      * @return экземпляр обновленного предмета
      */
-    ItemDto updateItem(ItemDto itemDto, Long itemId, Long userId);
+    ItemDto updateItem(ItemDto itemDto, Long itemId, Long ownerId);
 
     /**
      * Метод получения предмета по ID
@@ -38,19 +38,20 @@ public interface ItemService {
     ItemDtoWithBooking getItemById(Long itemId, Long userId);
 
     /**
+     * Метод получения предмета по ID для бронирования (НЕ ДТО!)
      *
-     * @param itemId
-     * @return
+     * @param itemId ID предмета
+     * @return экземпляр сущности предемата
      */
     Item getItemByIdForBooking(Long itemId);
 
     /**
      * Метод получения предметов пользователя
      *
-     * @param userId ID владельца предемета
+     * @param ownerId ID владельца предемета
      * @return список экземпляров предметов-дто пользователя
      */
-    List<ItemDtoWithBooking> retrieveAllItemByUserId(Long userId);
+    List<ItemDtoWithBooking> retrieveAllItemByUserId(Long ownerId);
 
     /**
      * Метод поиска предмета по ключевому слову
@@ -61,19 +62,12 @@ public interface ItemService {
     List<ItemDto> searchItemByKeyword(String keyword);
 
     /**
+     * Метод добавления отзыва
      *
-     * @param itemId
-     * @return
+     * @param itemId     ID предмета
+     * @param userId     ID пользователя, кто оставляет запись
+     * @param commentDto экземляр сущности commentDto
+     * @return экземляр сущности созданного отзыва
      */
-    Item getItemByIdWithoutDto(Long itemId);
-
-    /**
-     *
-     * @param itemId
-     * @param userId
-     * @param commentDto
-     * @return
-     */
-
     CommentDto addComment(Long itemId, Long userId, CommentDto commentDto);
 }

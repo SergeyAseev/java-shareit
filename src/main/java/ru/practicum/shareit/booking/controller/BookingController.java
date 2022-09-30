@@ -39,8 +39,8 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDto> getAllBookingByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                  @PathParam("state") String state) {
+    public List<BookingDto> getAllBookingForBooker(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                   @PathParam("state") String state) {
         return bookingService.getALlByBooker(userId, state);
     }
 

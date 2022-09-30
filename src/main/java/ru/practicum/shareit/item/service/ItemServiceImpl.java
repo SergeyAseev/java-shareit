@@ -21,6 +21,7 @@ import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,41 +34,43 @@ public class ItemServiceImpl implements ItemService {
 
 
     private final ItemRepository itemRepository;
-
     private final BookingRepository bookingRepository;
-
     private final CommentRepository commentRepository;
 
     @Autowired
     private UserService userService;
 
-    @Override
+    @Transactional
     public ItemDto createItem(ItemDto itemDto, Long userId) {
+
         User owner = UserMapper.toUser(userService.getUserById(userId));
         Item item = ItemMapper.toItem(itemDto, owner);
 
         validate(item);
         item.setOwner(owner);
         log.info("Create Item with ID {}", item.getId());
+
         return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
-    @Override
+    @Transactional
     public ItemDto updateItem(ItemDto itemDto, Long itemId, Long userId) {
+
         User owner = UserMapper.toUser(userService.getUserById(userId));
         Item item = ItemMapper.toItem(itemDto, owner);
 
         Item updatedItem = getItemValid(item, itemId, userId);
         log.info("Updated item with ID {}", itemId);
         itemRepository.save(updatedItem);
+
         return ItemMapper.toItemDto(updatedItem);
     }
 
-    @Override
+    @Transactional
     public ItemDtoWithBooking getItemById(Long itemId, Long userId) {
+
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));
-        User user = UserMapper.toUser(userService.getUserById(userId));
         List<Comment> commentList = getCommentsByItemId(item);
 
         if (item.getOwner().getId().equals(userId)) {
@@ -80,38 +83,31 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
-    @Override
+    @Transactional
     public Item getItemByIdForBooking(Long itemId) {
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));
-        return item;
-    }
-
-    @Override
-    public Item getItemByIdWithoutDto(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));
     }
 
-
-    @Override
-    public List<ItemDtoWithBooking> retrieveAllItemByUserId(Long userId) {
-        return itemRepository.findByOwnerIdOrderByIdAsc(userId)
-                    .stream()
-                    .map(item -> {
-                        List<Comment> comments = getCommentsByItemId(item);
-                        Booking lastBooking = bookingRepository
-                                .findFirstByItem_IdAndEndBeforeOrderByEndDesc(item.getId(), LocalDateTime.now());
-                        Booking nextBooking = bookingRepository
-                                .findTopByItem_IdAndStartAfterOrderByStartAsc(item.getId(), LocalDateTime.now());
-                        return ItemMapper.toItemDtoWithBooking(comments, lastBooking, nextBooking, item);
-                            }
-                    )
-                    .collect(Collectors.toList());
+    @Transactional
+    public List<ItemDtoWithBooking> retrieveAllItemByUserId(Long ownerId) {
+        return itemRepository.findByOwnerIdOrderByIdAsc(ownerId)
+                .stream()
+                .map(item -> {
+                            List<Comment> comments = getCommentsByItemId(item);
+                            Booking lastBooking = bookingRepository
+                                    .findFirstByItem_IdAndEndBeforeOrderByEndDesc(item.getId(), LocalDateTime.now());
+                            Booking nextBooking = bookingRepository
+                                    .findTopByItem_IdAndStartAfterOrderByStartAsc(item.getId(), LocalDateTime.now());
+                            return ItemMapper.toItemDtoWithBooking(comments, lastBooking, nextBooking, item);
+                        }
+                )
+                .collect(Collectors.toList());
     }
 
-    @Override
+    @Transactional
     public List<ItemDto> searchItemByKeyword(String keyword) {
+
         if (keyword.isBlank() || keyword.isEmpty()) {
             return new ArrayList<>();
         }
@@ -121,14 +117,15 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
-    @Override
+    @Transactional
     public CommentDto addComment(Long itemId, Long userId, CommentDto commentDto) {
+
         User user = UserMapper.toUser(userService.getUserById(userId));
         Item item = getItemByIdForBooking(itemId);
         Comment comment = CommentMapper.toComment(commentDto, item, user);
 
         if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
-            throw new ValidationException("Empty comment");
+            throw new ValidationException("Empty comment is prohibited");
         }
         Booking booking = bookingRepository.findByBooker_IdAndEndBefore(comment.getUser().getId(),
                 LocalDateTime.now());
@@ -136,11 +133,10 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("User didn't booked anything");
         }
 
-
         comment.setCreated(LocalDateTime.now());
         commentRepository.save(comment);
-
         log.info("Create Comment with ID {}", comment.getId());
+
         return CommentMapper.toCommentDto(comment);
     }
 
@@ -162,7 +158,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Item getItemValid(Item item, Long itemId, Long userId) {
-        Item updatedItem = getItemByIdWithoutDto(itemId);
+        Item updatedItem = getItemByIdForBooking(itemId);
         User user = UserMapper.toUser(userService.getUserById(userId));
 
         if (user != null && !updatedItem.getOwner().getId().equals(userId))

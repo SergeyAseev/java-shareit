@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -19,7 +20,8 @@ import java.util.Set;
 public class Item {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -41,4 +43,8 @@ public class Item {
             fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Booking> bookings = new HashSet<>();
+
+    @OneToOne
+    @JoinColumn(name = "request_id")
+    private ItemRequest request;
 }

@@ -61,7 +61,6 @@ public class ItemMapper {
             nxtBooking = null;
         }
 
-
         return ItemDtoWithBooking.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -71,6 +70,5 @@ public class ItemMapper {
                 .nextBooking(nxtBooking)
                 .comments(comments)
                 .build();
-
     }
 }

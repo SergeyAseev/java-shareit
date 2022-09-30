@@ -13,14 +13,13 @@ import ru.practicum.shareit.booking.model.BookingStateEnum;
 import ru.practicum.shareit.booking.model.BookingStatusEnum;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +31,6 @@ import java.util.stream.Collectors;
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
 
     @Autowired
     private UserService userService;
@@ -41,12 +38,11 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     private ItemService itemService;
 
-    @Override
+    @Transactional
     public BookingDto createBooking(BookingDto bookingDto, Long userId) {
         User booker = UserMapper.toUser(userService.getUserById(userId));
         Item item = itemService.getItemByIdForBooking(bookingDto.getItemId());
         Booking booking = BookingMapper.toBooking(booker, item, bookingDto);
-
 
         validate(booking);
         booking.setStatus(BookingStatusEnum.WAITING);
@@ -55,36 +51,19 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
-    @Override
+    @Transactional
     public BookingDto updateBooking(Long bookingId, Long userId, Boolean isApproved) {
+        Booking booking = getBookingById(bookingId);
 
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException(String.format("Booking with ID %s doesn't exists",
-                        bookingId)));
-
-        if (!booking.getItem().getOwner().getId().equals(userId)) {
-            throw new NotFoundException("User != owner");
-        }
-        if (booking.getStatus().equals(BookingStatusEnum.APPROVED) && isApproved) {
-            throw new ValidationException("Already approved");
-        }
-        if (booking.getStatus().equals(BookingStatusEnum.REJECTED) && !isApproved) {
-            throw new ValidationException("Already rejected");
-        }
-        if (isApproved) {
-            booking.setStatus(BookingStatusEnum.APPROVED);
-        } else {
-            booking.setStatus(BookingStatusEnum.REJECTED);
-        }
+        validateForUpdating(booking, userId, isApproved);
+        log.info("Booking with ID {} is updated", booking.getId());
 
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
-    @Override
+    @Transactional
     public BookingDto getBookingById(Long bookingId, Long userId) {
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException(String.format("Booking with ID %s doesn't exists",
-                        bookingId)));
+        Booking booking = getBookingById(bookingId);
         userService.getUserById(userId);
 
         if (booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().getId().equals(userId)) {
@@ -92,6 +71,13 @@ public class BookingServiceImpl implements BookingService {
         } else {
             throw new NotFoundException(String.format("Booking with ID %s wasn't find", bookingId));
         }
+    }
+
+    @Transactional
+    public Booking getBookingById(Long bookingId) {
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException(String.format("Booking with ID %s doesn't exists",
+                        bookingId)));
     }
 
     public List<BookingDto> getAllBookingByUserId(List<Booking> bookings, String stateStr) {
@@ -144,18 +130,18 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<BookingDto> getAllBookingForOwner(Long userId, String stateStr) {
+    @Transactional
+    public List<BookingDto> getAllBookingForOwner(Long ownerId, String stateStr) {
 
-        userService.getUserById(userId);
-        List<Booking> bookings = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(userId);
+        userService.getUserById(ownerId);
+        List<Booking> bookings = bookingRepository.findAllByItem_Owner_IdOrderByStartDesc(ownerId);
         if (bookings.isEmpty()) {
             throw new NotFoundException("There's no bookings");
         }
         return getAllBookingByUserId(bookings, stateStr);
     }
 
-    @Override
+    @Transactional
     public List<BookingDto> getALlByBooker(Long userId, String stateStr) {
 
         userService.getUserById(userId);
@@ -165,18 +151,6 @@ public class BookingServiceImpl implements BookingService {
         }
         return getAllBookingByUserId(bookings, stateStr);
     }
-
-/*    @Override
-    public Booking getLastBookingByItemId(Long itemId, Long userId) {
-        userService.getUserById(userId);
-        return bookingRepository.findFirstByItem_IdOrderByStartDesc(itemId);
-    }
-
-    @Override
-    public Booking getNextBookingByItemId(Long itemId, Long userId) {
-        userService.getUserById(userId);
-        return bookingRepository.findTopByItem_IdOrderByStartDesc(itemId);;
-    }*/
 
     private void validate(Booking booking) {
 
@@ -195,6 +169,22 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getEnd().isBefore(LocalDateTime.now())) {
             throw new ValidationException("End in the past");
         }
+    }
 
+    private void validateForUpdating(Booking booking, Long userId, Boolean isApproved) {
+        if (!booking.getItem().getOwner().getId().equals(userId)) {
+            throw new NotFoundException("User != owner");
+        }
+        if (booking.getStatus().equals(BookingStatusEnum.APPROVED) && isApproved) {
+            throw new ValidationException("Already approved");
+        }
+        if (booking.getStatus().equals(BookingStatusEnum.REJECTED) && !isApproved) {
+            throw new ValidationException("Already rejected");
+        }
+        if (isApproved) {
+            booking.setStatus(BookingStatusEnum.APPROVED);
+        } else {
+            booking.setStatus(BookingStatusEnum.REJECTED);
+        }
     }
 }
