@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.service;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
-import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
 
@@ -36,14 +35,6 @@ public interface ItemService {
      * @return экзепляр сущности предмета
      */
     ItemDtoWithBooking getItemById(Long itemId, Long userId);
-
-    /**
-     * Метод получения предмета по ID для бронирования (НЕ ДТО!)
-     *
-     * @param itemId ID предмета
-     * @return экземпляр сущности предемата
-     */
-    Item getItemByIdForBooking(Long itemId);
 
     /**
      * Метод получения предметов пользователя

@@ -37,6 +37,6 @@ public class Booking {
     private User booker;
 
     @Enumerated(EnumType.STRING)
-    private BookingStatusEnum status;
+    private BookingStatus status;
 
 }

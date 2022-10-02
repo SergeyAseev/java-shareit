@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
@@ -17,9 +16,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -37,13 +35,13 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-    @Autowired
-    private UserService userService;
+    private final UserRepository userRepository;
 
     @Transactional
     public ItemDto createItem(ItemDto itemDto, Long userId) {
 
-        User owner = UserMapper.toUser(userService.getUserById(userId));
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
         Item item = ItemMapper.toItem(itemDto, owner);
 
         validate(item);
@@ -56,7 +54,8 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemDto updateItem(ItemDto itemDto, Long itemId, Long userId) {
 
-        User owner = UserMapper.toUser(userService.getUserById(userId));
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
         Item item = ItemMapper.toItem(itemDto, owner);
 
         Item updatedItem = getItemValid(item, itemId, userId);
@@ -81,12 +80,6 @@ public class ItemServiceImpl implements ItemService {
         } else {
             return ItemMapper.toItemDtoWithBooking(commentList, null, null, item);
         }
-    }
-
-    @Transactional
-    public Item getItemByIdForBooking(Long itemId) {
-        return itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));
     }
 
     @Transactional
@@ -120,16 +113,19 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public CommentDto addComment(Long itemId, Long userId, CommentDto commentDto) {
 
-        User user = UserMapper.toUser(userService.getUserById(userId));
-        Item item = getItemByIdForBooking(itemId);
-        Comment comment = CommentMapper.toComment(commentDto, item, user);
-
         if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
             throw new ValidationException("Empty comment is prohibited");
         }
-        Booking booking = bookingRepository.findByBooker_IdAndEndBefore(comment.getUser().getId(),
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));
+        Comment comment = CommentMapper.toComment(commentDto, item, user);
+
+        List<Booking> booking = bookingRepository.findByBookerIdStatePast(comment.getUser().getId(),
                 LocalDateTime.now());
-        if (booking == null) {
+        if (booking.isEmpty()) {
             throw new ValidationException("User didn't booked anything");
         }
 
@@ -158,8 +154,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Item getItemValid(Item item, Long itemId, Long userId) {
-        Item updatedItem = getItemByIdForBooking(itemId);
-        User user = UserMapper.toUser(userService.getUserById(userId));
+
+        Item updatedItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
 
         if (user != null && !updatedItem.getOwner().getId().equals(userId))
             throw new NotFoundException("Предмет не доступен для брони");
