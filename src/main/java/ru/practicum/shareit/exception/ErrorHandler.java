@@ -16,7 +16,7 @@ public class ErrorHandler {
     public ResponseEntity<Map<String, String>> handleValidateException(
             final ValidationException e) {
         log.info(e.getMessage());
-        return new ResponseEntity<>(Map.of("message",
+        return new ResponseEntity<>(Map.of("error",
                 e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
@@ -24,7 +24,7 @@ public class ErrorHandler {
     public ResponseEntity<Map<String, String>> handleNotFoundException(
             final NotFoundException e) {
         log.info(e.getMessage());
-        return new ResponseEntity<>(Map.of("message",
+        return new ResponseEntity<>(Map.of("error",
                 e.getMessage()), HttpStatus.NOT_FOUND);
     }
 
@@ -32,7 +32,15 @@ public class ErrorHandler {
     public ResponseEntity<Map<String, String>> handleExistsElementException(
             final ExistsElementException e) {
         log.error(e.getMessage());
-        return new ResponseEntity<>(Map.of("message", e.getMessage()),
+        return new ResponseEntity<>(Map.of("error", e.getMessage()),
                 HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(
+            final IllegalArgumentException e) {
+        log.info(e.getMessage());
+        return new ResponseEntity<>(Map.of("error",
+                e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

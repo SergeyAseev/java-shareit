@@ -1,7 +1,8 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 
 import java.util.List;
 
@@ -21,26 +22,27 @@ public interface ItemService {
      *
      * @param itemDto экземпляр сущности предмета-дто, который обновляется
      * @param itemId  ID предмета
-     * @param userId  ID владельца предмета
+     * @param ownerId ID владельца предмета
      * @return экземпляр обновленного предмета
      */
-    ItemDto updateItem(ItemDto itemDto, Long itemId, Long userId);
+    ItemDto updateItem(ItemDto itemDto, Long itemId, Long ownerId);
 
     /**
      * Метод получения предмета по ID
      *
      * @param itemId ID предмета
+     * @param userId ID пользователя
      * @return экзепляр сущности предмета
      */
-    ItemDto getItemById(Long itemId);
+    ItemDtoWithBooking getItemById(Long itemId, Long userId);
 
     /**
      * Метод получения предметов пользователя
      *
-     * @param userId ID владельца предемета
+     * @param ownerId ID владельца предемета
      * @return список экземпляров предметов-дто пользователя
      */
-    List<ItemDto> retrieveAllItemByUserId(Long userId);
+    List<ItemDtoWithBooking> retrieveAllItemByUserId(Long ownerId);
 
     /**
      * Метод поиска предмета по ключевому слову
@@ -50,5 +52,13 @@ public interface ItemService {
      */
     List<ItemDto> searchItemByKeyword(String keyword);
 
-    Item getItemByIdWithoutDto(Long itemId);
+    /**
+     * Метод добавления отзыва
+     *
+     * @param itemId     ID предмета
+     * @param userId     ID пользователя, кто оставляет запись
+     * @param commentDto экземляр сущности commentDto
+     * @return экземляр сущности созданного отзыва
+     */
+    CommentDto addComment(Long itemId, Long userId, CommentDto commentDto);
 }
