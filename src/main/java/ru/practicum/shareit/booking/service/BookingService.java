@@ -41,7 +41,7 @@ public interface BookingService {
      * @param state  статус брони по времени и подтверждению(?)
      * @return список экземляров бронирований
      */
-    List<BookingDto> getAllBookingByOwnerId(Long userId, String state);
+    List<BookingDto> getAllBookingByOwnerId(Long userId, String state, int from, int size);
 
 
     /**
@@ -51,5 +51,5 @@ public interface BookingService {
      * @param state  state статус брони по времени и подтверждению(?)
      * @return список экземляров бронирований
      */
-    List<BookingDto> getAllBookingByUserId(Long userId, String state);
+    List<BookingDto> getAllBookingByUserId(Long userId, String state, int from, int size);
 }
