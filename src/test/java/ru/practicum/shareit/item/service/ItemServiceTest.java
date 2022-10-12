@@ -3,11 +3,15 @@ package ru.practicum.shareit.item.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.CommentRepository;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.model.Item;
@@ -55,7 +59,7 @@ class ItemServiceTest {
         userRepository.save(user2);
         this.itemRepository = itemRepository;
         this.itemService = itemService;
-        item1 = itemRepository.save(item);
+        item1 = item;
         this.bookingService = bookingService;
         this.bookingRepository = bookingRepository;
         itemCommentDto = ItemMapper.toItemDtoWithBooking(new ArrayList<>(),
@@ -68,6 +72,8 @@ class ItemServiceTest {
 
     @Test
     void getItemById() {
+        ItemDto item1 = itemService.createItem(ItemMapper.toItemDto(item),
+                item.getOwner().getId());
         assertEquals(itemCommentDto.getId(), itemService.getItemById(item1.getId(), user.getId()).getId());
     }
 
@@ -89,5 +95,29 @@ class ItemServiceTest {
     void searchItemByText() {
         assertEquals(List.of(ItemMapper.toItemDto(item1)).get(0).getId(),
                 itemService.searchItemByKeyword("unit").get(0).getId());
+    }
+
+    @Test
+    void addComment() throws InterruptedException {
+        itemService.createItem(ItemMapper.toItemDto(item),
+                item.getOwner().getId());
+
+        BookingDto bookingDto = BookingDto.builder()
+                .start(LocalDateTime.now().plusSeconds(2))
+                .end(LocalDateTime.now().plusDays(2))
+                .itemId(item1.getId())
+                .build();
+        Booking booking = BookingMapper.toBooking(user2, item1, bookingService.createBooking(
+                bookingDto, user2.getId()));
+        BookingDto updatedBooking = bookingService.updateBooking(booking.getId(), user.getId(), true);
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("text");
+        Thread.sleep(2000);
+        CommentDto comment = itemService.addComment(
+                item1.getId(),
+                user2.getId(),
+                commentDto
+        );
+        assertEquals(commentRepository.findById(comment.getId()).orElse(null).getText(), comment.getText());
     }
 }
