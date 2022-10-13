@@ -23,7 +23,7 @@ class UserServiceTest {
     UserRepository userRepository;
 
     @Autowired
-    private UserService userService;
+    private final UserService userService;
     static User user1 = new User(1L, "user1", "user1@mail.ru");
     static User user2 = new User(2L, "user2", "user2@mail.ru");
     static User user3 = new User(3L, "user3", "user3@mail.ru");
@@ -72,7 +72,7 @@ class UserServiceTest {
 
     @Test
     void createDoubleUserTest() {
-        UserDto newUser = userService.createUser(UserMapper.toUserDto(user3));
+        userService.createUser(UserMapper.toUserDto(user3));
         assertThrows(ExistsElementException.class, () -> userService.createUser(UserMapper.toUserDto(user4)));
     }
 
