@@ -133,12 +133,12 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException(String.format("Item with ID %s not found", itemId)));
         Comment comment = CommentMapper.toComment(commentDto, item, user);
 
-/*        List<Booking> booking = bookingRepository.findByBookerIdStatePast(comment.getUser().getId(),
+        List<Booking> booking = bookingRepository.findByBookerIdStatePast(comment.getUser().getId(),
                 LocalDateTime.now());
 
         if (booking.isEmpty()) {
             throw new ValidationException("User didn't booked anything");
-        }*/
+        }
 
         comment.setCreated(LocalDateTime.now());
         commentRepository.save(comment);

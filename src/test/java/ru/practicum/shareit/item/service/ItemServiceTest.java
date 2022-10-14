@@ -181,7 +181,7 @@ class ItemServiceTest {
 
         BookingDto bookingDto = BookingDto.builder()
                 .start(LocalDateTime.now().plusSeconds(2))
-                .end(LocalDateTime.now().plusDays(2))
+                .end(LocalDateTime.now().plusSeconds(4))
                 .itemId(item1.getId())
                 .build();
         Booking booking = BookingMapper.toBooking(user2, item1, bookingService.createBooking(
@@ -189,7 +189,7 @@ class ItemServiceTest {
         bookingService.updateBooking(booking.getId(), user.getId(), true);
         CommentDto commentDto = new CommentDto();
         commentDto.setText("text");
-        Thread.sleep(2000);
+        Thread.sleep(10000);
         CommentDto comment = itemService.addComment(
                 item1.getId(),
                 user2.getId(),
