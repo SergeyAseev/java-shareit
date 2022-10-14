@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.CommentRepository;
 import ru.practicum.shareit.item.ItemMapper;
@@ -98,6 +99,12 @@ class ItemServiceTest {
     }
 
     @Test
+    void searchItemByBlankTextTest() {
+        assertEquals(new ArrayList<>(),
+                itemService.searchItemByKeyword(" "));
+    }
+
+    @Test
     void searchItemByTextTest() {
         assertEquals(List.of(ItemMapper.toItemDto(item1)).get(0).getId(),
                 itemService.searchItemByKeyword("descrip").get(0).getId());
@@ -150,6 +157,24 @@ class ItemServiceTest {
     }
 
     @Test
+    void updateItemNotAcceptedTest() {
+        Item item = new Item(1L, user, "item1", "description1", true,
+                null, null);
+        itemService.createItem(ItemMapper.toItemDto(item),
+                item.getOwner().getId());
+
+        Item toUpdateItem = new Item();
+        toUpdateItem.setAvailable(false);
+        toUpdateItem.setDescription("udated");
+        toUpdateItem.setName("updatedName");
+        userService.getUserById(1L);
+        itemRepository.findById(1L);
+
+        assertThrows(NotFoundException.class,
+                () -> itemService.updateItem(ItemMapper.toItemDto(toUpdateItem), 1L, 2L));
+    }
+
+    @Test
     void addCommentTest() throws InterruptedException {
         itemService.createItem(ItemMapper.toItemDto(item),
                 item.getOwner().getId());
@@ -161,7 +186,7 @@ class ItemServiceTest {
                 .build();
         Booking booking = BookingMapper.toBooking(user2, item1, bookingService.createBooking(
                 bookingDto, user2.getId()));
-        BookingDto updatedBooking = bookingService.updateBooking(booking.getId(), user.getId(), true);
+        bookingService.updateBooking(booking.getId(), user.getId(), true);
         CommentDto commentDto = new CommentDto();
         commentDto.setText("text");
         Thread.sleep(2000);
