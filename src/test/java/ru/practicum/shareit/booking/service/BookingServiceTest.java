@@ -177,8 +177,8 @@ class BookingServiceTest {
 
     @Test
     void getAllBookingByUserIdTest() {
-        assertEquals(List.of(booking).get(0).getId(),
-                bookingService.getAllBookingByUserId(user2.getId(), "ALL", 0, 10).get(0).getId());
+        assertEquals(3,
+                bookingService.getAllBookingByUserId(user2.getId(), "ALL", 0, 10).size());
     }
 
     @Test
@@ -195,8 +195,8 @@ class BookingServiceTest {
 
     @Test
     void getCurrentBookingByUserIdTest() {
-        assertEquals(List.of(booking).get(0).getId(),
-                bookingService.getAllBookingByUserId(user2.getId(), "CURRENT", 0, 10).get(0).getId());
+        assertEquals(3,
+                bookingService.getAllBookingByUserId(user2.getId(), "CURRENT", 0, 10).size());
     }
 
     @Test
@@ -233,8 +233,8 @@ class BookingServiceTest {
 
     @Test
     void getAllBookingByOwnerIdTest() {
-        assertEquals(List.of(booking).get(0).getId(),
-                bookingService.getAllBookingByOwnerId(user.getId(), "ALL", 0, 10).get(0).getId());
+        assertEquals(3,
+                bookingService.getAllBookingByOwnerId(user.getId(), "ALL", 0, 10).size());
     }
 
     @Test
@@ -282,7 +282,7 @@ class BookingServiceTest {
 
     @Test
     void getAllBookingByOwnerIdNULLStateTest() {
-        assertEquals(List.of(booking).get(0).getId(),
-                bookingService.getAllBookingByOwnerId(user.getId(), null, 0, 10).get(0).getId());
+        assertEquals(3,
+                bookingService.getAllBookingByOwnerId(user.getId(), null, 0, 10).size());
     }
 }
