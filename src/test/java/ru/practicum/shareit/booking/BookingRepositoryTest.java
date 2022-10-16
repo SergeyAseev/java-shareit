@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 class BookingRepositoryTest {
@@ -115,6 +116,18 @@ class BookingRepositoryTest {
         Pageable pageable = PageRequest.of(1 / 10, 10);
         List<Booking> bookings = bookingRepository.findOwnerAll(user1.getId(), pageable);
         assertThat(bookings.size(), is(2));
+    }
+
+    @Test
+    void updateBookingTest() {
+        booking.setStatus(BookingStatus.APPROVED);
+        assertEquals(BookingStatus.APPROVED, bookingRepository.findById(booking.getId()).orElseThrow().getStatus());
+    }
+
+    @Test
+    void updateBooking2Test() {
+        booking.setStatus(BookingStatus.REJECTED);
+        assertEquals(BookingStatus.REJECTED, bookingRepository.findById(booking.getId()).orElseThrow().getStatus());
     }
 
 }

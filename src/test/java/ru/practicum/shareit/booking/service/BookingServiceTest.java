@@ -146,18 +146,6 @@ class BookingServiceTest {
     }
 
     @Test
-    void updateBookingTest() {
-        bookingService.updateBooking(booking.getId(), user.getId(), true);
-        assertEquals(BookingStatus.APPROVED, bookingRepository.findById(booking.getId()).orElseThrow().getStatus());
-    }
-
-    @Test
-    void updateBooking2Test() {
-        bookingService.updateBooking(booking.getId(), user.getId(), false);
-        assertEquals(BookingStatus.REJECTED, bookingRepository.findById(booking.getId()).orElseThrow().getStatus());
-    }
-
-    @Test
     void updateBookingAlreadyApprovedTest() {
         assertThrows(ValidationException.class, () -> bookingService
                 .updateBooking(bookingApproved.getId(), user.getId(), true));
