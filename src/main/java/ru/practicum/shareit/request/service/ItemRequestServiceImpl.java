@@ -49,12 +49,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
 
-        return itemRequestRepository.findByRequester_IdOrderByCreatedAsc(userId)
-                .stream()
-                .map(itemRequest -> {
-                    List<Item> items = itemRepository.findByRequest_Id(itemRequest.getId(), Sort.by("id").descending());
-                    return ItemRequestMapper.toItemRequestDto(itemRequest, items);
-                })
+        List<ItemRequest> itemRequests = itemRequestRepository.findByRequester_IdOrderByCreatedAsc(userId);
+        List<Item> items = itemRequestRepository.findItemsByListOfRequests(itemRequests);
+
+        return itemRequests.stream()
+                .map(e -> ItemRequestMapper.toItemRequestDto(e, items))
                 .collect(Collectors.toList());
     }
 
@@ -65,7 +64,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
 
         ItemRequest itemRequest = itemRequestRepository.findById(itemRequestId)
-                        .orElseThrow(() -> new NotFoundException(String.format("ItemRequest with ID %s not found", itemRequestId)));
+                .orElseThrow(() -> new NotFoundException(String.format("ItemRequest with ID %s not found", itemRequestId)));
         List<Item> items = itemRepository.findByRequest_Id(itemRequest.getId(), Sort.by("id").descending());
 
         return ItemRequestMapper.toItemRequestDto(itemRequest, items);
@@ -76,13 +75,13 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         if (size <= 0 || from < 0) {
             throw new ValidationException("size and from have to positive");
         }
-        return itemRequestRepository.findByRequester_IdNot(userId,
-                        PageRequest.of(from / size, size, Sort.by("created").descending()))
-                .stream()
-                .map(itemRequest -> {
-                    List<Item> items = itemRepository.findByRequest_Id(itemRequest.getId(), Sort.by("id").descending());
-                    return ItemRequestMapper.toItemRequestDto(itemRequest, items);
-                })
+
+        List<ItemRequest> itemRequests = itemRequestRepository.findByRequester_IdNot(userId,
+                PageRequest.of(from / size, size, Sort.by("created").descending()));
+        List<Item> items = itemRequestRepository.findItemsByListOfRequests(itemRequests);
+
+        return itemRequests.stream()
+                .map(e -> ItemRequestMapper.toItemRequestDto(e, items))
                 .collect(Collectors.toList());
     }
 

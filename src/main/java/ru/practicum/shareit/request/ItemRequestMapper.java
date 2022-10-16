@@ -20,11 +20,11 @@ public class ItemRequestMapper {
     }
 
     public static ItemRequestDto toItemRequestDto(ItemRequest itemRequest, List<Item> items) {
-        List<ItemRequestDto.Item> itemRequestDtos = null;
+        List<ItemRequestDto.ItemDto> itemRequestDtos = null;
         if (items != null) {
             itemRequestDtos = items
                     .stream()
-                    .map(item -> ItemRequestDto.Item.builder()
+                    .map(item -> ItemRequestDto.ItemDto.builder()
                             .id(item.getId())
                             .available(item.getAvailable())
                             .requestId(item.getRequest().getId())

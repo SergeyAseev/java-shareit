@@ -26,21 +26,11 @@ public class ItemMapper {
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
         return item;
-
-/*        return Item.builder()
-                .id(itemDto.getId())
-                .owner(user)
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
-                .build();*/
     }
 
 
     public static ItemDto toItemDto(Item item) {
-        Long requestId = null;
-        if (item.getRequest() != null)
-            requestId = item.getRequest().getId();
+        Long requestId = item.getRequest() == null ? null : item.getRequest().getId();
         return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
