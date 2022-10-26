@@ -105,6 +105,7 @@ public class BookingServiceImpl implements BookingService {
 
     public List<BookingDto> getAllBookingByUser(Long useId, BookingState state, int from, int size) {
 
+        getStateByStr(state.name());
         List<Booking> bookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         Pageable pageable = PageRequest.of(from / size, size);
@@ -138,6 +139,7 @@ public class BookingServiceImpl implements BookingService {
 
     public List<BookingDto> getAllBookingByOwner(Long useId, BookingState state, int from, int size) {
 
+        getStateByStr(state.name());
         List<Booking> bookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         Pageable pageable = PageRequest.of(from / size, size);

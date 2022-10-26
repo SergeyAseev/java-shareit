@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -19,6 +20,8 @@ import ru.practicum.shareit.user.service.UserService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -161,114 +164,114 @@ class BookingServiceTest {
                 .updateBooking(booking.getId(), user2.getId(), true));
     }
 
-    /*@Test
+    @Test
     void getAllBookingByUserIdTest() {
         assertEquals(3,
-                bookingService.getAllBookingByUserId(user2.getId(), "ALL", 0, 10).size());
+                bookingService.getAllBookingByUserId(user2.getId(), BookingState.ALL, 0, 10).size());
     }
 
     @Test
     void getPastBookingByUserIdTest() {
         assertEquals(new ArrayList<>(),
-                bookingService.getAllBookingByUserId(user2.getId(), "PAST", 0, 10));
+                bookingService.getAllBookingByUserId(user2.getId(), BookingState.PAST, 0, 10));
     }
 
     @Test
     void getFutureBookingByUserIdTest() {
         assertEquals(new ArrayList<>(),
-                bookingService.getAllBookingByUserId(user2.getId(), "FUTURE", 0, 10));
+                bookingService.getAllBookingByUserId(user2.getId(), BookingState.FUTURE, 0, 10));
     }
 
     @Test
     void getCurrentBookingByUserIdTest() {
         assertEquals(3,
-                bookingService.getAllBookingByUserId(user2.getId(), "CURRENT", 0, 10).size());
+                bookingService.getAllBookingByUserId(user2.getId(), BookingState.CURRENT, 0, 10).size());
     }
 
     @Test
     void getWaitingBookingByUserIdTest() {
         assertEquals(List.of(booking).get(0).getId(),
-                bookingService.getAllBookingByUserId(user2.getId(), "WAITING", 0, 10).get(0).getId());
+                bookingService.getAllBookingByUserId(user2.getId(), BookingState.WAITING, 0, 10).get(0).getId());
     }
 
     @Test
     void getRejectedBookingByUserIdTest() {
         assertEquals(List.of(bookingRejected).get(0).getId(),
-                bookingService.getAllBookingByUserId(user2.getId(), "REJECTED", 0, 10).get(0).getId());
+                bookingService.getAllBookingByUserId(user2.getId(), BookingState.REJECTED, 0, 10).get(0).getId());
     }
 
     @Test
     void getAllBookingByUserIdNegativeTest() {
         assertThrows(IllegalArgumentException.class, () -> bookingService
-                .getAllBookingByUserId(user2.getId(), "ALL", -1, -1));
+                .getAllBookingByUserId(user2.getId(), BookingState.ALL, -1, -1));
     }
 
     @Test
     void getAllBookingByUserIdBadWithoutBookingTest() {
-        assertThrows(NotFoundException.class, () -> bookingService
-                .getAllBookingByOwnerId(user2.getId(), "BAD_STATE", 0, 10).get(0).getId());
+        assertThrows(IllegalArgumentException.class, () -> bookingService
+                .getAllBookingByOwnerId(user2.getId(), BookingState.valueOf("BAD_STATE"), 0, 10).get(0).getId());
 
     }
 
     @Test
     void getAllBookingByUserIdBadStateTest() {
-        assertThrows(ValidationException.class, () -> bookingService
-                .getAllBookingByUserId(user2.getId(), "BAD_STATE", 0, 10).get(0).getId());
+        assertThrows(IllegalArgumentException.class, () -> bookingService
+                .getAllBookingByUserId(user2.getId(), BookingState.valueOf("BAD_STATE"), 0, 10).get(0).getId());
 
     }
 
     @Test
     void getAllBookingByOwnerIdTest() {
         assertEquals(3,
-                bookingService.getAllBookingByOwnerId(user.getId(), "ALL", 0, 10).size());
+                bookingService.getAllBookingByOwnerId(user.getId(), BookingState.ALL, 0, 10).size());
     }
 
     @Test
     void getPastBookingByOwnerIdTest() {
         assertEquals(new ArrayList<>(),
-                bookingService.getAllBookingByOwnerId(user.getId(), "PAST", 0, 10));
+                bookingService.getAllBookingByOwnerId(user.getId(), BookingState.PAST, 0, 10));
     }
 
     @Test
     void getFutureBookingByOwnerIdTest() {
         assertEquals(new ArrayList<>(),
-                bookingService.getAllBookingByOwnerId(user.getId(), "FUTURE", 0, 10));
+                bookingService.getAllBookingByOwnerId(user.getId(), BookingState.FUTURE, 0, 10));
     }
 
     @Test
     void getCurrentBookingByOwnerIdTest() {
         assertEquals(3,
-                bookingService.getAllBookingByOwnerId(user.getId(), "CURRENT", 0, 10).size());
+                bookingService.getAllBookingByOwnerId(user.getId(), BookingState.CURRENT, 0, 10).size());
     }
 
     @Test
     void getWaitingBookingByOwnerIdTest() {
         assertEquals(List.of(booking).get(0).getId(),
-                bookingService.getAllBookingByOwnerId(user.getId(), "WAITING", 0, 10).get(0).getId());
+                bookingService.getAllBookingByOwnerId(user.getId(), BookingState.WAITING, 0, 10).get(0).getId());
     }
 
     @Test
     void getRejectedBookingByOwnerIdTest() {
         assertEquals(List.of(bookingRejected).get(0).getId(),
-                bookingService.getAllBookingByOwnerId(user.getId(), "REJECTED", 0, 10).get(0).getId());
+                bookingService.getAllBookingByOwnerId(user.getId(), BookingState.REJECTED, 0, 10).get(0).getId());
     }
 
     @Test
     void getAllBookingByOwnerIdNegativeTest() {
         assertThrows(ValidationException.class, () -> bookingService
-                .getAllBookingByOwnerId(user.getId(), "ALL", -1, -1));
+                .getAllBookingByOwnerId(user.getId(), BookingState.ALL, -1, -1));
     }
 
     @Test
     void getAllBookingByOwnerIdBadStateTest() {
-        assertThrows(ValidationException.class, () -> bookingService
-                .getAllBookingByOwnerId(user.getId(), "BAD_STATE", 0, 10).get(0).getId());
+        assertThrows(IllegalArgumentException.class, () -> bookingService
+                .getAllBookingByOwnerId(user.getId(), BookingState.valueOf("BAD_STATE"), 0, 10).get(0).getId());
 
-    }*/
+    }
 
 /*    @Test
     void getAllBookingByOwnerIdNULLStateTest() {
         assertEquals(3,
-                bookingService.getAllBookingByOwnerId(user.getId(), null, 0, 10).size());
+                bookingService.getAllBookingByOwnerId(user.getId(), BookingState.valueOf(null), 0, 10).size());
     }*/
 }
