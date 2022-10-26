@@ -88,7 +88,7 @@ class BookingControllerTest {
 
     @Test
     void getAllByUser() throws Exception {
-        when(bookingService.getAllBookingByUserId(anyLong(), anyString(), anyInt(), anyInt()))
+        when(bookingService.getAllBookingByUserId(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings")
@@ -101,12 +101,12 @@ class BookingControllerTest {
 
         Mockito
                 .verify(bookingService, Mockito.times(1))
-                .getAllBookingByUserId(anyLong(), anyString(), anyInt(), anyInt());
+                .getAllBookingByUserId(anyLong(), any(), anyInt(), anyInt());
     }
 
     @Test
     void getAllByOwner() throws Exception {
-        when(bookingService.getAllBookingByOwnerId(anyLong(), anyString(), anyInt(), anyInt()))
+        when(bookingService.getAllBookingByOwnerId(anyLong(), any(), anyInt(), anyInt()))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings/owner")
@@ -117,6 +117,6 @@ class BookingControllerTest {
 
         Mockito
                 .verify(bookingService, Mockito.times(1))
-                .getAllBookingByOwnerId(anyLong(), anyString(), anyInt(), anyInt());
+                .getAllBookingByOwnerId(anyLong(), any(), anyInt(), anyInt());
     }
 }

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.BookingState;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public interface BookingService {
      * @param state  статус брони по времени и подтверждению(?)
      * @return список экземляров бронирований
      */
-    List<BookingDto> getAllBookingByOwnerId(Long userId, String state, int from, int size);
+    List<BookingDto> getAllBookingByOwnerId(Long userId, BookingState state, int from, int size);
 
 
     /**
@@ -51,5 +52,5 @@ public interface BookingService {
      * @param state  state статус брони по времени и подтверждению(?)
      * @return список экземляров бронирований
      */
-    List<BookingDto> getAllBookingByUserId(Long userId, String state, int from, int size);
+    List<BookingDto> getAllBookingByUserId(Long userId, BookingState state, int from, int size);
 }

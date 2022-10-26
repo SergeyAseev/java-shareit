@@ -103,9 +103,8 @@ public class BookingServiceImpl implements BookingService {
         return state;
     }
 
-    public List<BookingDto> getAllBookingByUser(Long useId, String stateStr, int from, int size) {
+    public List<BookingDto> getAllBookingByUser(Long useId, BookingState state, int from, int size) {
 
-        BookingState state = getStateByStr(stateStr);
         List<Booking> bookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         Pageable pageable = PageRequest.of(from / size, size);
@@ -137,9 +136,8 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-    public List<BookingDto> getAllBookingByOwner(Long useId, String stateStr, int from, int size) {
+    public List<BookingDto> getAllBookingByOwner(Long useId, BookingState state, int from, int size) {
 
-        BookingState state = getStateByStr(stateStr);
         List<Booking> bookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         Pageable pageable = PageRequest.of(from / size, size);
@@ -172,7 +170,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Transactional
-    public List<BookingDto> getAllBookingByOwnerId(Long ownerId, String stateStr, int from, int size) {
+    public List<BookingDto> getAllBookingByOwnerId(Long ownerId, BookingState state, int from, int size) {
 
         userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", ownerId)));
@@ -183,11 +181,11 @@ public class BookingServiceImpl implements BookingService {
         if (size <= 0 || from < 0) {
             throw new ValidationException("size and from have to positive");
         }
-        return getAllBookingByOwner(ownerId, stateStr, from, size);
+        return getAllBookingByOwner(ownerId, state, from, size);
     }
 
     @Transactional
-    public List<BookingDto> getAllBookingByUserId(Long userId, String stateStr, int from, int size) {
+    public List<BookingDto> getAllBookingByUserId(Long userId, BookingState state, int from, int size) {
 
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
@@ -200,7 +198,7 @@ public class BookingServiceImpl implements BookingService {
         if (size <= 0 || from < 0) {
             throw new ValidationException("size and from have to positive");
         }
-        return getAllBookingByUser(userId, stateStr, from, size);
+        return getAllBookingByUser(userId, state, from, size);
     }
 
     private void validate(Booking booking) {
