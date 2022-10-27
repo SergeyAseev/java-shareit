@@ -43,17 +43,39 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return ItemRequestMapper.toItemRequestDto(itemRequestRepository.save(itemRequest), null);
     }
 
+    /**
+     * Долг с прошлого раза с предложением написать тесты.
+     * Посмотрев код еще раз понял, что замечения верно и метод работает неправильно, так что
+     * тесты писать не стал. Начав переписывать пришел к первончальному варианту с небольшим рефакторингом
+     * в виде вынесения дублирующегося кода в отдельный метод.
+     */
     @Override
     public List<ItemRequestDto> getAllMyItemRequest(Long userId) {
 
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
-
         List<ItemRequest> itemRequests = itemRequestRepository.findByRequester_IdOrderByCreatedAsc(userId);
-        List<Item> items = itemRequestRepository.findItemsByListOfRequests(itemRequests);
+        return retrieveRequestsForItems(itemRequests);
+    }
 
-        return itemRequests.stream()
-                .map(e -> ItemRequestMapper.toItemRequestDto(e, items))
+    @Override
+    public List<ItemRequestDto> findAll(Long userId, int from, int size) {
+
+        if (size <= 0 || from < 0) {
+            throw new ValidationException("size and from have to positive");
+        }
+        List<ItemRequest> itemRequests = itemRequestRepository.findByRequester_IdNot(userId,
+                PageRequest.of(from / size, size, Sort.by("created").descending()));
+        return retrieveRequestsForItems(itemRequests);
+    }
+
+    public List<ItemRequestDto> retrieveRequestsForItems(List<ItemRequest> itemRequests) {
+        return itemRequests
+                .stream()
+                .map(itemRequest -> {
+                    List<Item> items = itemRepository.findByRequest_Id(itemRequest.getId(), Sort.by("id").descending());
+                    return ItemRequestMapper.toItemRequestDto(itemRequest, items);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -69,22 +91,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         return ItemRequestMapper.toItemRequestDto(itemRequest, items);
     }
-
-    @Override
-    public List<ItemRequestDto> findAll(Long userId, int from, int size) {
-        if (size <= 0 || from < 0) {
-            throw new ValidationException("size and from have to positive");
-        }
-
-        List<ItemRequest> itemRequests = itemRequestRepository.findByRequester_IdNot(userId,
-                PageRequest.of(from / size, size, Sort.by("created").descending()));
-        List<Item> items = itemRequestRepository.findItemsByListOfRequests(itemRequests);
-
-        return itemRequests.stream()
-                .map(e -> ItemRequestMapper.toItemRequestDto(e, items))
-                .collect(Collectors.toList());
-    }
-
 
     private void validate(ItemRequest itemRequest) {
 

@@ -268,10 +268,4 @@ class BookingServiceTest {
                 .getAllBookingByOwnerId(user.getId(), BookingState.valueOf("BAD_STATE"), 0, 10).get(0).getId());
 
     }
-
-/*    @Test
-    void getAllBookingByOwnerIdNULLStateTest() {
-        assertEquals(3,
-                bookingService.getAllBookingByOwnerId(user.getId(), BookingState.valueOf(null), 0, 10).size());
-    }*/
 }

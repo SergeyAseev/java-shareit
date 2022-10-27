@@ -31,12 +31,12 @@ class BookingRepositoryTest {
     @Autowired
     private ItemRepository itemRepository;
 
-    User user1;
-    Item item1;
-    User user2;
-    Item item2;
-    Booking booking;
-    Booking bookingApproved;
+    private User user1;
+    private Item item1;
+    private User user2;
+    private Item item2;
+    private Booking booking;
+    private Booking bookingApproved;
 
 
     @BeforeEach

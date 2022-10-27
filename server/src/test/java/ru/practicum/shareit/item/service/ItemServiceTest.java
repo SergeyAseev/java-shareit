@@ -109,30 +109,6 @@ class ItemServiceTest {
                 itemService.searchItemByKeyword("descrip").get(0).getId());
     }
 
-/*    @Test
-    void createNotValidNameItemTest() {
-        Item item = new Item(1L, user, "", "description1", true,
-                null, null);
-        assertThrows(ValidationException.class, () -> itemService.createItem(ItemMapper.toItemDto(item),
-                item.getOwner().getId()));
-    }*/
-
-/*    @Test
-    void createNotValidDescriptionItemTest() {
-        Item item11 = new Item(1L, user, "item1", null, true,
-                null, null);
-        assertThrows(ValidationException.class, () -> itemService.createItem(ItemMapper.toItemDto(item11),
-                item11.getOwner().getId()));
-    }*/
-
-/*    @Test
-    void createNotValidAvailableItemTest() {
-        Item item = new Item(1L, user, "item1", "description1", null,
-                null, null);
-        assertThrows(ValidationException.class, () -> itemService.createItem(ItemMapper.toItemDto(item),
-                item.getOwner().getId()));
-    }*/
-
     @Test
     void updateItemTest() {
         Item item = new Item(1L, user, "item1", "description1", true,
