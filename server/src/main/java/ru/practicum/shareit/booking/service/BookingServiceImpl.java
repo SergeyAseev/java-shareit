@@ -180,9 +180,6 @@ public class BookingServiceImpl implements BookingService {
         if (bookings.isEmpty()) {
             throw new NotFoundException("There's no bookings");
         }
-        if (size <= 0 || from < 0) {
-            throw new ValidationException("size and from have to positive");
-        }
         return getAllBookingByOwner(ownerId, state, from, size);
     }
 
@@ -196,9 +193,6 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings = bookingRepository.findAllByBooker_IdOrderByStartDesc(userId, pageable);
         if (bookings.isEmpty()) {
             throw new NotFoundException("There's no bookings");
-        }
-        if (size <= 0 || from < 0) {
-            throw new ValidationException("size and from have to positive");
         }
         return getAllBookingByUser(userId, state, from, size);
     }

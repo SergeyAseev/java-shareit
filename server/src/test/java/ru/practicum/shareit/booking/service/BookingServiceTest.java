@@ -201,12 +201,6 @@ class BookingServiceTest {
     }
 
     @Test
-    void getAllBookingByUserIdNegativeTest() {
-        assertThrows(IllegalArgumentException.class, () -> bookingService
-                .getAllBookingByUserId(user2.getId(), BookingState.ALL, -1, -1));
-    }
-
-    @Test
     void getAllBookingByUserIdBadWithoutBookingTest() {
         assertThrows(IllegalArgumentException.class, () -> bookingService
                 .getAllBookingByOwnerId(user2.getId(), BookingState.valueOf("BAD_STATE"), 0, 10).get(0).getId());
@@ -254,12 +248,6 @@ class BookingServiceTest {
     void getRejectedBookingByOwnerIdTest() {
         assertEquals(List.of(bookingRejected).get(0).getId(),
                 bookingService.getAllBookingByOwnerId(user.getId(), BookingState.REJECTED, 0, 10).get(0).getId());
-    }
-
-    @Test
-    void getAllBookingByOwnerIdNegativeTest() {
-        assertThrows(ValidationException.class, () -> bookingService
-                .getAllBookingByOwnerId(user.getId(), BookingState.ALL, -1, -1));
     }
 
     @Test

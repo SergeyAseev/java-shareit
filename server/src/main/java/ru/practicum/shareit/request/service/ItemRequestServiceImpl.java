@@ -6,7 +6,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequestMapper;
@@ -36,19 +35,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto, user);
-        validate(itemRequest);
         itemRequest.setCreated(LocalDateTime.now());
 
         log.info("Create ItemRequest with ID {}", itemRequestDto.getId());
         return ItemRequestMapper.toItemRequestDto(itemRequestRepository.save(itemRequest), null);
     }
 
-    /**
-     * Долг с прошлого раза с предложением написать тесты.
-     * Посмотрев код еще раз понял, что замечения верно и метод работает неправильно, так что
-     * тесты писать не стал. Начав переписывать пришел к первончальному варианту с небольшим рефакторингом
-     * в виде вынесения дублирующегося кода в отдельный метод.
-     */
     @Override
     public List<ItemRequestDto> getAllMyItemRequest(Long userId) {
 
@@ -61,9 +53,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestDto> findAll(Long userId, int from, int size) {
 
-        if (size <= 0 || from < 0) {
-            throw new ValidationException("size and from have to positive");
-        }
         List<ItemRequest> itemRequests = itemRequestRepository.findByRequester_IdNot(userId,
                 PageRequest.of(from / size, size, Sort.by("created").descending()));
         return retrieveRequestsForItems(itemRequests);
@@ -90,12 +79,5 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<Item> items = itemRepository.findByRequest_Id(itemRequest.getId(), Sort.by("id").descending());
 
         return ItemRequestMapper.toItemRequestDto(itemRequest, items);
-    }
-
-    private void validate(ItemRequest itemRequest) {
-
-        if (itemRequest.getDescription() == null || itemRequest.getDescription().isBlank()) {
-            throw new ValidationException("Description has to be not empty");
-        }
     }
 }

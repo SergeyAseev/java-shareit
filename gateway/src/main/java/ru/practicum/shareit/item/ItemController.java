@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 
 @Slf4j
 @RestController
@@ -20,6 +21,17 @@ public class ItemController {
     @PostMapping
     public ResponseEntity<Object> createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @Valid @RequestBody ItemDto itemDto) {
+
+        if (itemDto.getDescription() == null) {
+            throw new ValidationException("Описание не может быть пустым");
+        }
+        if (itemDto.getName().isBlank()) {
+            throw new ValidationException("Название предмета не может быть пустым");
+        }
+        if (itemDto.getAvailable() == null) {
+            throw new ValidationException("Статус доступа не может быть пустым");
+        }
+
         log.info("Create Item={}", itemDto);
         return itemClient.createItem(itemDto, userId);
     }

@@ -48,7 +48,6 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException(String.format("User with ID %s not found", userId)));
         Item item = ItemMapper.toItem(itemDto, owner);
 
-        validate(item);
         item.setOwner(owner);
 
         if (item.getRequest() != null) {
@@ -149,19 +148,6 @@ public class ItemServiceImpl implements ItemService {
 
     public List<Comment> getCommentsByItemId(Item item) {
         return commentRepository.findByItem_IdOrderByCreatedDesc(item.getId());
-    }
-
-    private void validate(Item item) {
-        if (item.getDescription() == null) {
-            throw new ValidationException("Описание не может быть пустым");
-        }
-        if (item.getName().isBlank()) {
-            throw new ValidationException("Название предмета не может быть пустым");
-        }
-        if (item.getAvailable() == null) {
-            throw new ValidationException("Статус доступа не может быть пустым");
-        }
-
     }
 
     private Item getItemValid(Item item, Long itemId, Long userId) {

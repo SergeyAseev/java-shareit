@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -23,6 +24,11 @@ public class ItemRequestController {
     @PostMapping
     public ResponseEntity<Object> createItemRequest(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                     @RequestBody @Valid ItemRequestDto itemRequestDto) {
+
+        if (itemRequestDto.getDescription() == null || itemRequestDto.getDescription().isBlank()) {
+            throw new ValidationException("Description has to be not empty");
+        }
+
         log.info("Create ItemRequest={}", itemRequestDto);
         return itemRequestClient.createItemRequest(userId, itemRequestDto);
     }
