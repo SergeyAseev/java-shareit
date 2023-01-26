@@ -1,4 +1,4 @@
-# java-shareit (сервис для шеринга и поиска вещей). Учебный бэкенд-проект.
+# java-shareit (сервис для шеринга и поиска вещей)
 
 Стэк: Java 11, PostgresSQL, Docker, SpringBoot, Hibernate, Maven, Lombok.
 
